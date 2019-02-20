@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#Files to ignore in this project:
+config.py
+comments_replied_to.txt
+.idea
+
 # C extensions
 *.so
 
