@@ -3,6 +3,7 @@ import config
 import time
 from oracleScrapper import *
 
+
 # This function creates the connection between this script and reddit via PRAW
 def bot_login():
     print("Logging " + config.username + " in...")
@@ -31,14 +32,23 @@ def run_bot(access, comments):
     for comment in access.subreddit('learnjava+javahelp').comments(limit=25):
         time.sleep(3)
         print("Searching for comments...")
-        if ("!DocFetcher" in comment.body or "!df" in comment.body or "!DF" in comment.body) and comment.id not in comments and not comment.author == access.user.me():
+        if ("!DocFetcher" in comment.body or "!df" in comment.body or "!DF" in comment.body) and\
+                comment.id not in comments and not comment.author == access.user.me():
             print("Found Comment...")
             if "j11" in comment.body or "java11" in comment.body:
                 com = comment.body.split()
                 if len(com) == 3:
-                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and ("j" in com[1] and "11" in com[1]):
-                        # search_jdk is a method inside oracleScrapper
-                        reply = search_jdk(com[1], com[-1])
+                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and\
+                            ("j" in com[1] and "11" in com[1]):
+                        if "::" in com[-1]:
+                            method_class = com[-1].split("::")
+                            reply = get_method_information(method_class[1], get_j11_class(method_class[0]))
+                        elif "." in com[-1]:
+                            method_class = com[-1].split(".")
+                            reply = get_method_information(method_class[1], get_j11_class(method_class[0]))
+                        else:
+                            # search_jdk is a method inside oracleScrapper
+                            reply = search_jdk(com[1], com[-1])
                         print("Leaving Reply for " + comment.id + "...")
                         comment.reply(reply)
                         comments.append(comment.id)
@@ -48,8 +58,17 @@ def run_bot(access, comments):
             elif "java7" in comment.body or "j7" in comment.body:
                 com = comment.body.split()
                 if len(com) == 3:
-                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and ("j" in com[1] and "7" in com[1]):
-                        reply = search_jdk(com[1], com[-1])
+                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and\
+                            ("j" in com[1] and "7" in com[1]):
+                        if "::" in com[-1]:
+                            method_class = com[-1].split("::")
+                            reply = get_method_information(method_class[1], get_j7_class(method_class[0]))
+                        elif "." in com[-1]:
+                            method_class = com[-1].split(".")
+                            reply = get_method_information(method_class[1], get_j7_class(method_class[0]))
+                        else:
+                            # search_jdk is a method inside oracleScrapper
+                            reply = search_jdk(com[1], com[-1])
                         print("Leaving Reply for " + comment.id + "...")
                         comment.reply(reply)
                         comments.append(comment.id)
@@ -58,8 +77,17 @@ def run_bot(access, comments):
             elif "java8" in comment.body or "j8" in comment.body or "java" in comment.body:
                 com = comment.body.split()
                 if len(com) == 3:
-                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and (com[1] == "j8" or com[1] == "java" or com[1] == "java8"):
-                        reply = search_jdk(com[1], com[-1])
+                    if (com[0] == "!DocFetcher" or com[0] == "!df" or com[0] == "!DF") and\
+                            (com[1] == "j8" or com[1] == "java" or com[1] == "java8"):
+                        if "::" in com[-1]:
+                            method_class = com[-1].split("::")
+                            reply = get_method_information(method_class[1], get_j8_class(method_class[0]))
+                        elif "." in com[-1]:
+                            method_class = com[-1].split(".")
+                            reply = get_method_information(method_class[1], get_j8_class(method_class[0]))
+                        else:
+                            # search_jdk is a method inside oracleScrapper
+                            reply = search_jdk(com[1], com[-1])
                         print("Leaving Reply for " + comment.id + "...")
                         comment.reply(reply)
                         comments.append(comment.id)

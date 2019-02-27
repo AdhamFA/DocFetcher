@@ -2,6 +2,70 @@ import bs4 as bs
 import urllib.request
 
 
+def get_j8_class(j_class):
+    sauce = urllib.request.urlopen('https://docs.oracle.com/javase/8/docs/api/allclasses-noframe.html').read()
+    soup = bs.BeautifulSoup(sauce, 'lxml')
+    link = "classNotFound"
+    for url in soup.find_all('a'):
+        if j_class == url.string:
+            link = "https://docs.oracle.com/javase/8/docs/api/" + url.get('href')
+            break
+    return link
+
+
+def get_j7_class(j_class):
+    sauce = urllib.request.urlopen('https://docs.oracle.com/javase/7/docs/api/allclasses-noframe.html').read()
+    soup = bs.BeautifulSoup(sauce, 'lxml')
+    link = "classNotFound"
+    for url in soup.find_all('a'):
+        if j_class == url.string:
+            link = "https://docs.oracle.com/javase/7/docs/api/" + url.get('href')
+            break
+    return link
+
+
+def get_j11_class(j_class):
+    sauce = urllib.request.urlopen('https://docs.oracle.com/en/java/javase/11/docs/api/allclasses.html').read()
+    soup = bs.BeautifulSoup(sauce, 'lxml')
+    link = "classNotFound"
+    for url in soup.find_all('a'):
+        if j_class == url.string:
+            link = "https://docs.oracle.com/en/java/javase/11/docs/api/" + url.get('href')
+            break
+    return link
+
+
+# This function searches a link for methods and returns information about them
+def get_method_information(method_requested, link):
+    if link == "classNotFound":
+        return "I was not able to find the class you referenced.\n\n^(I am a bot still in development." \
+               " For questions or suggestions, you can message /u/ADhoom)"
+    inner_sauce = urllib.request.urlopen(link)
+    broth = bs.BeautifulSoup(inner_sauce, 'lxml')
+    method_detail = broth.find("h3", text="Method Detail").find_parent('li')
+    method_information = ""
+    is_found = False
+    for method in method_detail.find_all("ul", class_="blockList"):
+        method_name = method.find("h4").text
+        if method_name == method_requested:
+            method_pre = method.find("pre").text
+            method_desc = method.find("div", class_="block").text
+            ref = method.previous_sibling.previous_sibling.name
+            method_information += ("#Here's what I found about the **" + method_name + "** method:\n\n")
+            method_information += "##" + broth.title.text + "\n\n"
+            method_information += ("~~~\n" + method_pre + "\n~~~" "\n\n")
+            method_information += ("\n\n" + method_desc + "\n\n")
+            method_information += ("[Method Documentation Page](" + (link+ref) + ")\n\n")
+            is_found = True
+            break
+    if is_found is False:
+        method_information += "I was not able to find any information about **" + method_requested +\
+                              "** in the oracle documentation.\n\n"
+        method_information += "[Oracle Java 8 Documentation]("+link+")\n\n"
+    method_information += "^(I am a bot still in development. For questions or suggestions, you can message /u/ADhoom)"
+    return method_information
+
+
 # This function searches the oracle java 11 api for a word a user wants and returns its information
 def _java11_scrapper(j_class):
     sauce = urllib.request.urlopen('https://docs.oracle.com/en/java/javase/11/docs/api/allclasses.html').read()
